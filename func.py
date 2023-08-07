@@ -4,7 +4,7 @@ import numpy as np
 import typing
 from PIL import Image
 from datetime import datetime
-import mysql.connector
+
 
 model = tf.keras.models.load_model("model/xception_latest.h5")
 class_names = [
@@ -43,25 +43,6 @@ def preprocess_image(image: Image) -> np.ndarray:
     return image_array
 
 
-def getCompId(name):
-    mydb = mysql.connector.connect(
-        host="34.69.199.102",
-        user="root",
-        password="",
-        database="components",
-    )
-
-    mycursor = mydb.cursor()
-    meow = name
-    meowmeow = (meow,)
-    mycursor.execute("SELECT * FROM comps WHERE name= %s", meowmeow)
-    myresult = mycursor.fetchall()
-    compid = myresult[0][0]
-    if compid is not None:
-        return compid
-    else:
-        return "error"
-
 
 
 def predict_image(image: np.ndarray) -> dict:
@@ -81,7 +62,6 @@ def predict_image(image: np.ndarray) -> dict:
         data_predictions = {}
         data_predictions["Components Name"] = (class_names[i])
         data_predictions["Components Value"] = (predictions[0, i] * 100)
-        data_predictions["Components ID"] = (getCompId(class_names[i]))
         data_list.append(data_predictions)
 
     return data_list
